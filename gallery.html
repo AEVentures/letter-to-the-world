@@ -11,15 +11,42 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
     .serif { font-family: 'Cormorant Garamond', serif; }
+    @keyframes float-balloon { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-22px) rotate(3deg); } }
+    .balloon { animation: float-balloon 4.5s ease-in-out infinite; }
+    .balloon:nth-child(2) { animation-delay: 0.8s; }
+    .balloon:nth-child(3) { animation-delay: 1.6s; }
+    .balloon:nth-child(4) { animation-delay: 2.4s; }
+    @keyframes banner-wave { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
+    #bdayBanner { animation: banner-wave 3s ease-in-out infinite; }
   </style>
 </head>
-<body class="bg-stone-50 text-stone-900 antialiased">
-  <header class="text-center pt-16 pb-8 px-6">
-    <p class="text-xs uppercase tracking-[0.3em] text-stone-500 mb-5">A Birthday Gallery</p>
+<body class="bg-stone-50 text-stone-900 antialiased overflow-x-hidden">
+  <div class="flex justify-center gap-6 md:gap-10 text-4xl md:text-6xl pt-6 select-none pointer-events-none">
+    <span class="balloon">🎈</span>
+    <span class="balloon">🎂</span>
+    <span class="balloon">🎉</span>
+    <span class="balloon">🎈</span>
+  </div>
+
+  <header class="text-center pt-6 pb-8 px-6">
+    <p id="bdayBanner" class="inline-block text-xs md:text-sm uppercase tracking-[0.3em] bg-stone-900 text-white px-4 py-2 rounded-full mb-5 shadow">🎉 Happy Birthday, MauriceMark! 🎉</p>
     <h1 class="serif text-5xl md:text-7xl font-semibold leading-tight mb-4">For MauriceMark</h1>
     <p class="text-lg md:text-xl text-stone-600 italic serif mb-6">August 2, 2026</p>
     <a href="index.html" class="text-sm text-stone-500 underline hover:text-stone-800">Read the birthday letter</a>
   </header>
+
+  <audio id="bgMusic" loop preload="none">
+    <source src="audio/celebrate-good-times.mp3" type="audio/mpeg">
+  </audio>
+  <button id="musicToggle" onclick="toggleMusic()" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-full shadow-lg hover:bg-stone-700 transition">
+    <span id="musicIcon">🎵</span>
+    <span id="musicLabel" class="text-sm font-medium">Play Music</span>
+  </button>
+  <button id="confettiBtn" onclick="burstConfetti()" class="fixed bottom-6 left-6 z-50 flex items-center gap-2 bg-pink-600 text-white px-5 py-3 rounded-full shadow-lg hover:bg-pink-500 transition">
+    <span>🎊</span>
+    <span class="text-sm font-medium">Celebrate!</span>
+  </button>
+
   <main class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 px-4 pb-20 max-w-7xl mx-auto">
       <img src="gallery-photos/0ff42bca-18e1-4fe4-8799-e0990538282b.jpg" alt="MauriceMark" loading="lazy" class="w-full mb-4 rounded shadow-sm hover:shadow-md transition break-inside-avoid">
       <img src="gallery-photos/2DE6B9E4-E19D-460C-80EC-41E75CE3AEDE.jpg" alt="MauriceMark" loading="lazy" class="w-full mb-4 rounded shadow-sm hover:shadow-md transition break-inside-avoid">
@@ -1346,5 +1373,40 @@
       <img src="gallery-photos/Resized_Resized_20231209_111325(1).jpg" alt="MauriceMark" loading="lazy" class="w-full mb-4 rounded shadow-sm hover:shadow-md transition break-inside-avoid">
       <img src="gallery-photos/Screenshot 2023-03-08 at 10.43.37 AM.jpg" alt="MauriceMark" loading="lazy" class="w-full mb-4 rounded shadow-sm hover:shadow-md transition break-inside-avoid">
   </main>
+
+  <footer class="text-center text-stone-400 text-xs pb-10">
+    <p>Music: "Keep it Up - Funky Uplifting" by Davide Bozzaro, via Jamendo/Internet Archive (CC BY-NC-ND 3.0)</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script>
+    function toggleMusic() {
+      const audio = document.getElementById('bgMusic');
+      const icon = document.getElementById('musicIcon');
+      const label = document.getElementById('musicLabel');
+      if (audio.paused) {
+        audio.play();
+        icon.textContent = '🔊';
+        label.textContent = 'Pause Music';
+        burstConfetti();
+      } else {
+        audio.pause();
+        icon.textContent = '🎵';
+        label.textContent = 'Play Music';
+      }
+    }
+
+    function burstConfetti() {
+      if (typeof confetti !== 'function') return;
+      const colors = ['#f43f5e', '#f59e0b', '#10b981', '#3b82f6', '#a855f7'];
+      confetti({ particleCount: 120, spread: 90, origin: { y: 0.3 }, colors });
+      confetti({ particleCount: 60, angle: 60, spread: 70, origin: { x: 0 }, colors });
+      confetti({ particleCount: 60, angle: 120, spread: 70, origin: { x: 1 }, colors });
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(burstConfetti, 500);
+    });
+  </script>
 </body>
 </html>
