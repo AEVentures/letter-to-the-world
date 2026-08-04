@@ -18,7 +18,7 @@ def main() -> int:
         return 1
 
     images_html = "\n".join(
-        f'      <img src="gallery-photos/{escape(p.name)}" alt="Maurice Mark" loading="lazy" class="w-full mb-4 rounded shadow-sm hover:shadow-md transition break-inside-avoid">'
+        f'      <img src="gallery-photos/{escape(p.name)}" alt="MauriceMark" loading="lazy" class="w-full mb-4 rounded shadow-sm hover:shadow-md transition break-inside-avoid">'
         for p in photos
     )
 
@@ -27,7 +27,7 @@ def main() -> int:
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maurice Mark — Birthday Gallery</title>
+  <title>MauriceMark — Birthday Gallery</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +40,7 @@ def main() -> int:
 <body class="bg-stone-50 text-stone-900 antialiased">
   <header class="text-center pt-16 pb-8 px-6">
     <p class="text-xs uppercase tracking-[0.3em] text-stone-500 mb-5">A Birthday Gallery</p>
-    <h1 class="serif text-5xl md:text-7xl font-semibold leading-tight mb-4">For Maurice Mark</h1>
+    <h1 class="serif text-5xl md:text-7xl font-semibold leading-tight mb-4">For MauriceMark</h1>
     <p class="text-lg md:text-xl text-stone-600 italic serif mb-6">August 2, 2026</p>
     <a href="index.html" class="text-sm text-stone-500 underline hover:text-stone-800">Read the birthday letter</a>
   </header>
