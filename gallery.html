@@ -35,7 +35,7 @@
     <a href="index.html" class="text-sm text-stone-500 underline hover:text-stone-800">Read the birthday letter</a>
   </header>
 
-  <audio id="bgMusic" loop preload="none">
+  <audio id="bgMusic" loop preload="auto">
     <source src="audio/celebrate-good-times.mp3" type="audio/mpeg">
   </audio>
   <button id="musicToggle" onclick="toggleMusic()" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-full shadow-lg hover:bg-stone-700 transition">
@@ -1380,15 +1380,23 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script>
-    function toggleMusic() {
+    async function toggleMusic() {
       const audio = document.getElementById('bgMusic');
       const icon = document.getElementById('musicIcon');
       const label = document.getElementById('musicLabel');
       if (audio.paused) {
-        audio.play();
-        icon.textContent = '🔊';
-        label.textContent = 'Pause Music';
-        burstConfetti();
+        icon.textContent = '⏳';
+        label.textContent = 'Loading…';
+        try {
+          await audio.play();
+          icon.textContent = '🔊';
+          label.textContent = 'Pause Music';
+          burstConfetti();
+        } catch (err) {
+          icon.textContent = '🎵';
+          label.textContent = 'Play Music';
+          console.error('Music playback failed:', err);
+        }
       } else {
         audio.pause();
         icon.textContent = '🎵';
