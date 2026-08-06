@@ -1380,29 +1380,35 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script>
-    async function toggleMusic() {
-      const audio = document.getElementById('bgMusic');
-      const icon = document.getElementById('musicIcon');
-      const label = document.getElementById('musicLabel');
-      if (audio.paused) {
-        icon.textContent = '⏳';
-        label.textContent = 'Loading…';
-        try {
-          await audio.play();
-          icon.textContent = '🔊';
-          label.textContent = 'Pause Music';
-          burstConfetti();
-        } catch (err) {
-          icon.textContent = '🎵';
-          label.textContent = 'Play Music';
-          console.error('Music playback failed:', err);
-        }
+    const bgMusic = document.getElementById('bgMusic');
+
+    function setMusicUI(icon, label) {
+      document.getElementById('musicIcon').textContent = icon;
+      document.getElementById('musicLabel').textContent = label;
+    }
+
+    function toggleMusic() {
+      if (bgMusic.paused) {
+        bgMusic.play().catch((err) => console.error('Music playback failed:', err));
       } else {
-        audio.pause();
-        icon.textContent = '🎵';
-        label.textContent = 'Play Music';
+        bgMusic.pause();
       }
     }
+
+    let confettiPending = false;
+    bgMusic.addEventListener('play', () => {
+      confettiPending = true;
+      setMusicUI('⏳', 'Loading…');
+    });
+    bgMusic.addEventListener('playing', () => {
+      setMusicUI('🔊', 'Pause Music');
+      if (confettiPending) {
+        confettiPending = false;
+        burstConfetti();
+      }
+    });
+    bgMusic.addEventListener('pause', () => setMusicUI('🎵', 'Play Music'));
+    bgMusic.addEventListener('error', () => setMusicUI('🎵', 'Play Music'));
 
     function burstConfetti() {
       if (typeof confetti !== 'function') return;

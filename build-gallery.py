@@ -59,7 +59,7 @@ def main() -> int:
     <a href="index.html" class="text-sm text-stone-500 underline hover:text-stone-800">Read the birthday letter</a>
   </header>
 
-  <audio id="bgMusic" loop preload="none">
+  <audio id="bgMusic" loop preload="auto">
     <source src="audio/celebrate-good-times.mp3" type="audio/mpeg">
   </audio>
   <button id="musicToggle" onclick="toggleMusic()" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-full shadow-lg hover:bg-stone-700 transition">
@@ -81,21 +81,35 @@ def main() -> int:
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script>
+    const bgMusic = document.getElementById('bgMusic');
+
+    function setMusicUI(icon, label) {{
+      document.getElementById('musicIcon').textContent = icon;
+      document.getElementById('musicLabel').textContent = label;
+    }}
+
     function toggleMusic() {{
-      const audio = document.getElementById('bgMusic');
-      const icon = document.getElementById('musicIcon');
-      const label = document.getElementById('musicLabel');
-      if (audio.paused) {{
-        audio.play();
-        icon.textContent = '🔊';
-        label.textContent = 'Pause Music';
-        burstConfetti();
+      if (bgMusic.paused) {{
+        bgMusic.play().catch((err) => console.error('Music playback failed:', err));
       }} else {{
-        audio.pause();
-        icon.textContent = '🎵';
-        label.textContent = 'Play Music';
+        bgMusic.pause();
       }}
     }}
+
+    let confettiPending = false;
+    bgMusic.addEventListener('play', () => {{
+      confettiPending = true;
+      setMusicUI('⏳', 'Loading…');
+    }});
+    bgMusic.addEventListener('playing', () => {{
+      setMusicUI('🔊', 'Pause Music');
+      if (confettiPending) {{
+        confettiPending = false;
+        burstConfetti();
+      }}
+    }});
+    bgMusic.addEventListener('pause', () => setMusicUI('🎵', 'Play Music'));
+    bgMusic.addEventListener('error', () => setMusicUI('🎵', 'Play Music'));
 
     function burstConfetti() {{
       if (typeof confetti !== 'function') return;
