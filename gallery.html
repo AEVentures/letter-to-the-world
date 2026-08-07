@@ -59,7 +59,9 @@
     <span class="text-sm font-medium">Celebrate!</span>
   </button>
 
-  <main class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 px-4 pb-20 max-w-7xl mx-auto">
+  <nav id="paginationTop" class="flex flex-wrap items-center justify-center gap-2 px-4 pb-6 max-w-7xl mx-auto"></nav>
+
+  <main class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 px-4 pb-10 max-w-7xl mx-auto">
       <figure class="group relative mb-4 break-inside-avoid" data-photo="0ff42bca-18e1-4fe4-8799-e0990538282b.jpg">
         <img src="gallery-photos/0ff42bca-18e1-4fe4-8799-e0990538282b.jpg" alt="MauriceMark" loading="lazy" class="w-full rounded shadow-sm hover:shadow-md transition">
         <button onclick="removePhoto(this)" title="Remove this photo" class="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-black/50 text-white text-lg leading-none opacity-0 group-hover:opacity-100 focus:opacity-100 transition">&times;</button>
@@ -5358,6 +5360,8 @@
       </figure>
   </main>
 
+  <nav id="paginationBottom" class="flex flex-wrap items-center justify-center gap-2 px-4 pb-20 max-w-7xl mx-auto"></nav>
+
   <footer class="text-center text-stone-400 text-xs pb-10">
     <p>Music: "Keep it Up - Funky Uplifting" by Davide Bozzaro, via Jamendo/Internet Archive (CC BY-NC-ND 3.0)</p>
   </footer>
@@ -5414,15 +5418,86 @@
       'Content-Type': 'application/json'
     };
 
+    // ---------------- Pagination ----------------
+    const PAGE_SIZE = 150;
+    let allFigures = Array.from(document.querySelectorAll('figure[data-photo]'));
+    let currentPage = 1;
+    const prefetched = new Set();
+
+    function totalPages() {
+      return Math.max(1, Math.ceil(allFigures.length / PAGE_SIZE));
+    }
+
+    function showPage(page, scroll) {
+      currentPage = Math.min(Math.max(1, page), totalPages());
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const visible = new Set(allFigures.slice(start, start + PAGE_SIZE));
+      allFigures.forEach((fig) => fig.classList.toggle('hidden', !visible.has(fig)));
+      renderPagination();
+      if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+      schedulePrefetch(currentPage + 1);
+    }
+
+    function makePageButton(label, page, opts) {
+      const btn = document.createElement('button');
+      btn.textContent = label;
+      const base = 'px-3 py-2 min-w-[2.5rem] rounded-full text-sm font-medium transition ';
+      if (opts && opts.active) {
+        btn.className = base + 'bg-stone-900 text-white shadow';
+      } else {
+        btn.className = base + 'bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 disabled:opacity-40 disabled:hover:bg-white';
+      }
+      if (opts && opts.disabled) btn.disabled = true;
+      else btn.addEventListener('click', () => showPage(page, true));
+      return btn;
+    }
+
+    function renderPagination() {
+      const pages = totalPages();
+      for (const id of ['paginationTop', 'paginationBottom']) {
+        const nav = document.getElementById(id);
+        nav.textContent = '';
+        if (pages <= 1) continue;
+        nav.appendChild(makePageButton('‹ Prev', currentPage - 1, { disabled: currentPage === 1 }));
+        for (let p = 1; p <= pages; p++) {
+          nav.appendChild(makePageButton(String(p), p, { active: p === currentPage }));
+        }
+        nav.appendChild(makePageButton('Next ›', currentPage + 1, { disabled: currentPage === pages }));
+      }
+    }
+
+    function schedulePrefetch(page) {
+      if (page < 1 || page > totalPages()) return;
+      const run = () => {
+        const start = (page - 1) * PAGE_SIZE;
+        for (const fig of allFigures.slice(start, start + PAGE_SIZE)) {
+          const src = fig.querySelector('img')?.getAttribute('src');
+          if (!src || prefetched.has(src)) continue;
+          prefetched.add(src);
+          const img = new Image();
+          img.decoding = 'async';
+          img.src = src;
+        }
+      };
+      if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 4000 });
+      else setTimeout(run, 1500);
+    }
+
+    // ---------------- Photo moderation ----------------
     async function applyHiddenPhotos() {
       try {
         const res = await fetch(SUPABASE_URL + '/rest/v1/hidden_photos?select=src', { headers: SB_HEADERS });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const hidden = new Set((await res.json()).map((row) => row.src));
         if (!hidden.size) return;
-        document.querySelectorAll('figure[data-photo]').forEach((fig) => {
-          if (hidden.has(fig.dataset.photo)) fig.remove();
+        allFigures = allFigures.filter((fig) => {
+          if (hidden.has(fig.dataset.photo)) {
+            fig.remove();
+            return false;
+          }
+          return true;
         });
+        showPage(currentPage, false);
       } catch (err) {
         console.error('Failed to load hidden photo list:', err);
       }
@@ -5448,12 +5523,15 @@
           throw new Error('HTTP ' + res.status + ': ' + detail);
         }
         fig.remove();
+        allFigures = allFigures.filter((f) => f !== fig);
+        showPage(currentPage, false);
       } catch (err) {
         console.error('Failed to remove photo:', err);
         alert('Sorry, the photo could not be removed. Please try again.');
       }
     }
 
+    showPage(1, false);
     applyHiddenPhotos();
   </script>
 </body>
