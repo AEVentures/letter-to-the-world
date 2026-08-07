@@ -31,6 +31,18 @@ def main() -> int:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MauriceMark — Birthday Gallery</title>
+  <meta name="description" content="A birthday photo gallery for MauriceMark — August 2, 2026.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aeventures.github.io/letter-to-the-world/gallery.html">
+  <meta property="og:title" content="For MauriceMark — Birthday Gallery">
+  <meta property="og:description" content="A birthday photo gallery for MauriceMark — August 2, 2026.">
+  <meta property="og:image" content="https://aeventures.github.io/letter-to-the-world/assets/og-gallery.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="For MauriceMark — Birthday Gallery">
+  <meta name="twitter:description" content="A birthday photo gallery for MauriceMark — August 2, 2026.">
+  <meta name="twitter:image" content="https://aeventures.github.io/letter-to-the-world/assets/og-gallery.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
