@@ -18,7 +18,10 @@ def main() -> int:
         return 1
 
     images_html = "\n".join(
-        f'      <img src="gallery-photos/{escape(p.name)}" alt="MauriceMark" loading="lazy" class="w-full mb-4 rounded shadow-sm hover:shadow-md transition break-inside-avoid">'
+        f'      <figure class="group relative mb-4 break-inside-avoid" data-photo="{escape(p.name)}">\n'
+        f'        <img src="gallery-photos/{escape(p.name)}" alt="MauriceMark" loading="lazy" class="w-full rounded shadow-sm hover:shadow-md transition">\n'
+        f'        <button onclick="removePhoto(this)" title="Remove this photo" class="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-black/50 text-white text-lg leading-none opacity-0 group-hover:opacity-100 focus:opacity-100 transition">&times;</button>\n'
+        f'      </figure>'
         for p in photos
     )
 
@@ -122,6 +125,56 @@ def main() -> int:
     window.addEventListener('load', () => {{
       setTimeout(burstConfetti, 500);
     }});
+
+    const SUPABASE_URL = 'https://vyxtuojutazzhtvwookc.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_NiRuO9blo_8ir6gzar2h9Q_ybFzCgBU';
+    const SB_HEADERS = {{
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json'
+    }};
+
+    async function applyHiddenPhotos() {{
+      try {{
+        const res = await fetch(SUPABASE_URL + '/rest/v1/hidden_photos?select=src', {{ headers: SB_HEADERS }});
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const hidden = new Set((await res.json()).map((row) => row.src));
+        if (!hidden.size) return;
+        document.querySelectorAll('figure[data-photo]').forEach((fig) => {{
+          if (hidden.has(fig.dataset.photo)) fig.remove();
+        }});
+      }} catch (err) {{
+        console.error('Failed to load hidden photo list:', err);
+      }}
+    }}
+
+    async function removePhoto(btn) {{
+      const fig = btn.closest('figure[data-photo]');
+      if (!fig) return;
+      const password = prompt('Enter the moderation password to remove this photo:');
+      if (!password) return;
+      try {{
+        const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/hide_photo', {{
+          method: 'POST',
+          headers: SB_HEADERS,
+          body: JSON.stringify({{ photo_src: fig.dataset.photo, password }})
+        }});
+        if (!res.ok) {{
+          const detail = await res.text();
+          if (detail.includes('INVALID_PASSWORD')) {{
+            alert('Incorrect password.');
+            return;
+          }}
+          throw new Error('HTTP ' + res.status + ': ' + detail);
+        }}
+        fig.remove();
+      }} catch (err) {{
+        console.error('Failed to remove photo:', err);
+        alert('Sorry, the photo could not be removed. Please try again.');
+      }}
+    }}
+
+    applyHiddenPhotos();
   </script>
 </body>
 </html>
