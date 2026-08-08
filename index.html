@@ -16,6 +16,8 @@
   <meta name='twitter:title' content='A Letter to the World'>
   <meta name='twitter:description' content='A call to courage, love, and joy. Recorded and written on August 2, 2026.'>
   <meta name='twitter:image' content='https://aeventures.github.io/letter-to-the-world/assets/og-letter.png'>
+  <link rel='icon' href='assets/favicon.svg' type='image/svg+xml'>
+  <link rel='apple-touch-icon' href='assets/apple-touch-icon.png'>
   <script src='https://cdn.tailwindcss.com'></script>
   <link rel='preconnect' href='https://fonts.googleapis.com'>
   <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -33,6 +35,7 @@
       <p class='text-xs uppercase tracking-[0.3em] text-stone-500 mb-5'>Captain's Log — August 2, 2026</p>
       <h1 class='serif text-5xl md:text-7xl font-semibold leading-tight mb-6'>A Letter to the World</h1>
       <p class='text-xl md:text-2xl text-stone-600 italic serif mb-4'>A call to courage, love, and joy</p>
+      <p class='serif text-lg md:text-xl text-stone-700 italic mb-4'>Written for my brother MauriceMark, on his birthday &mdash; and for anyone else who needs it.</p>
       <p class='text-stone-500 text-sm md:text-base'>Recorded and written on August 2, 2026.</p>
       <p class='mt-4'><a href='gallery.html' class='text-stone-500 underline hover:text-stone-800'>View the birthday photo gallery for MauriceMark →</a></p>
     </header>
@@ -56,14 +59,14 @@
     </article>
 
     <section class='mt-20 md:mt-28 border-t border-stone-300 pt-12 text-center'>
-      <h2 class='serif text-3xl md:text-4xl font-semibold mb-4'>Your Story Matters</h2>
-      <p class='text-stone-600 mb-8 text-lg'>If this moved you, write your own reflection and share it below. A beacon of hope grows brighter when more voices join in.</p>
+      <h2 class='serif text-3xl md:text-4xl font-semibold mb-4'>Leave a Birthday Message</h2>
+      <p class='text-stone-600 mb-8 text-lg'>Write a note for MauriceMark &mdash; a birthday wish, a favorite memory, or your own reflection on the letter. Every voice makes this brighter.</p>
       <div class='max-w-2xl mx-auto text-left'>
         <input id='commentName' type='text' maxlength='80' class='w-full mb-3 p-4 bg-white border border-stone-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-stone-400 text-base' placeholder='Your name (optional)'>
-        <textarea id='commentBody' rows='5' maxlength='2000' class='w-full p-5 bg-white border border-stone-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-stone-400 serif text-lg' placeholder='Write your own reflection here...'></textarea>
+        <textarea id='commentBody' rows='5' maxlength='2000' class='w-full p-5 bg-white border border-stone-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-stone-400 serif text-lg' placeholder='Write your birthday message or memory here...'></textarea>
         <div class='mt-4 flex items-center justify-between'>
-          <button id='commentSubmit' onclick='submitComment()' class='bg-stone-800 text-white px-8 py-3 rounded-full hover:bg-stone-700 transition font-medium disabled:opacity-50'>Share your reflection</button>
-          <p id='commentMsg' class='text-stone-600 hidden'>Thank you. Your reflection is posted.</p>
+          <button id='commentSubmit' onclick='submitComment()' class='bg-stone-800 text-white px-8 py-3 rounded-full hover:bg-stone-700 transition font-medium disabled:opacity-50'>Post your message</button>
+          <p id='commentMsg' class='text-stone-600 hidden'>Thank you. Your message is posted.</p>
         </div>
         <div id='commentList' class='mt-12 space-y-6'></div>
       </div>

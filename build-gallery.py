@@ -19,7 +19,7 @@ def main() -> int:
 
     images_html = "\n".join(
         f'      <figure class="group relative mb-4 break-inside-avoid" data-photo="{escape(p.name)}">\n'
-        f'        <img src="gallery-photos/{escape(p.name)}" alt="MauriceMark" loading="lazy" class="w-full rounded shadow-sm hover:shadow-md transition">\n'
+        f'        <img src="gallery-photos/{escape(p.name)}" alt="MauriceMark" loading="lazy" onclick="openLightbox(this)" class="w-full rounded shadow-sm hover:shadow-md transition cursor-zoom-in">\n'
         f'        <button onclick="removePhoto(this)" title="Remove this photo" class="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-black/50 text-white text-lg leading-none opacity-0 group-hover:opacity-100 focus:opacity-100 transition">&times;</button>\n'
         f'      </figure>'
         for p in photos
@@ -43,6 +43,8 @@ def main() -> int:
   <meta name="twitter:title" content="For MauriceMark — Birthday Gallery">
   <meta name="twitter:description" content="A birthday photo gallery for MauriceMark — August 2, 2026.">
   <meta name="twitter:image" content="https://aeventures.github.io/letter-to-the-world/assets/og-gallery.png">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,6 +96,14 @@ def main() -> int:
   </main>
 
   <nav id="paginationBottom" class="flex flex-wrap items-center justify-center gap-2 px-4 pb-20 max-w-7xl mx-auto"></nav>
+
+  <div id="lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/95" onclick="if (event.target === this) closeLightbox()">
+    <img id="lightboxImg" src="" alt="MauriceMark" class="max-h-[92vh] max-w-[94vw] rounded shadow-2xl select-none">
+    <button onclick="closeLightbox()" title="Close" class="absolute top-4 right-5 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/25 text-white text-3xl leading-none transition">&times;</button>
+    <button id="lightboxPrev" onclick="stepLightbox(-1)" title="Previous" class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/25 text-white text-3xl leading-none transition">&#8249;</button>
+    <button id="lightboxNext" onclick="stepLightbox(1)" title="Next" class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/25 text-white text-3xl leading-none transition">&#8250;</button>
+    <p id="lightboxCount" class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm"></p>
+  </div>
 
   <footer class="text-center text-stone-400 text-xs pb-10">
     <p>Music: "Keep it Up - Funky Uplifting" by Davide Bozzaro, via Jamendo/Internet Archive (CC BY-NC-ND 3.0)</p>
@@ -263,6 +273,63 @@ def main() -> int:
         alert('Sorry, the photo could not be removed. Please try again.');
       }}
     }}
+
+    // ---------------- Lightbox ----------------
+    let lightboxIndex = -1;
+
+    function openLightbox(imgEl) {{
+      const fig = imgEl.closest('figure[data-photo]');
+      lightboxIndex = allFigures.indexOf(fig);
+      if (lightboxIndex < 0) return;
+      updateLightbox();
+      const lb = document.getElementById('lightbox');
+      lb.classList.remove('hidden');
+      lb.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }}
+
+    function closeLightbox() {{
+      const lb = document.getElementById('lightbox');
+      lb.classList.add('hidden');
+      lb.classList.remove('flex');
+      document.body.style.overflow = '';
+      lightboxIndex = -1;
+    }}
+
+    function stepLightbox(delta) {{
+      if (lightboxIndex < 0) return;
+      lightboxIndex = (lightboxIndex + delta + allFigures.length) % allFigures.length;
+      updateLightbox();
+    }}
+
+    function updateLightbox() {{
+      const src = allFigures[lightboxIndex].querySelector('img').getAttribute('src');
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightboxCount').textContent = (lightboxIndex + 1) + ' / ' + allFigures.length;
+      for (const delta of [1, -1]) {{
+        const n = (lightboxIndex + delta + allFigures.length) % allFigures.length;
+        const pre = new Image();
+        pre.src = allFigures[n].querySelector('img').getAttribute('src');
+      }}
+    }}
+
+    document.addEventListener('keydown', (e) => {{
+      if (lightboxIndex < 0) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowRight') stepLightbox(1);
+      else if (e.key === 'ArrowLeft') stepLightbox(-1);
+    }});
+
+    let touchStartX = null;
+    document.getElementById('lightbox').addEventListener('touchstart', (e) => {{
+      touchStartX = e.changedTouches[0].clientX;
+    }}, {{ passive: true }});
+    document.getElementById('lightbox').addEventListener('touchend', (e) => {{
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      touchStartX = null;
+      if (Math.abs(dx) > 50) stepLightbox(dx < 0 ? 1 : -1);
+    }}, {{ passive: true }});
 
     showPage(1, false);
     applyHiddenPhotos();
